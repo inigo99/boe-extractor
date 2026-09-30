@@ -7,11 +7,14 @@ requires-python = ">=3.11"
 license = "MIT"
 dependencies = [
     "polars>=1.0",
+    "tokenizers>=0.20",
 ]
 
 [project.scripts]
 boe-fetch = "boe_extractor.fetch:main"
 boe-classify = "boe_extractor.classify:main"
+boe-docs = "boe_extractor.docs:main"
+boe-tokens = "boe_extractor.docs:tokens"
 
 [dependency-groups]
 dev = [
