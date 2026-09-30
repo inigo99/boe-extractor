@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Recorte del sumario real del BOE de 29-09-2026 (API de datos abiertos, formato XML).
+     La sección 2A contiene un item sintético para comprobar que se excluye: no copiamos nombres reales. -->
+<response>
+  <status><code>200</code><text>ok</text></status>
+  <data>
+    <sumario>
+      <metadatos><publicacion>BOE</publicacion><fecha_publicacion>20260929</fecha_publicacion></metadatos>
+      <diario numero="240">
+        <sumario_diario><identificador>BOE-S-2026-240</identificador><url_pdf szbytes="436258" szkbytes="426">https://www.boe.es/boe/dias/2026/09/29/pdfs/BOE-S-2026-240.pdf</url_pdf></sumario_diario>
+        <seccion codigo="2A" nombre="II. Autoridades y personal. - A. Nombramientos, situaciones e incidencias">
+          <departamento codigo="0000" nombre="DEPARTAMENTO SINTÉTICO">
+            <epigrafe nombre="Nombramientos">
+              <item><identificador>BOE-A-2026-99999</identificador><control>0000/00000</control><titulo>Item sintético de la sección II.A (debe excluirse).</titulo><url_pdf szbytes="1" szkbytes="1" pagina_inicial="1" pagina_final="1">https://example.invalid/x.pdf</url_pdf><url_html>https://example.invalid/x</url_html><url_xml>https://example.invalid/x.xml</url_xml></item>
+            </epigrafe>
+          </departamento>
+        </seccion>
+        <seccion codigo="2B" nombre="II. Autoridades y personal. - B. Oposiciones y concursos">
+          <departamento codigo="1820" nombre="CONSEJO GENERAL DEL PODER JUDICIAL">
+            <epigrafe nombre="Carrera Judicial">
+              <item><identificador>BOE-A-2026-20159</identificador><control>2026/14732</control><titulo>Acuerdo de 16 de septiembre de 2026, del Pleno del Consejo General del Poder Judicial, por el que se convoca la provisión de la Presidencia del Tribunal Superior de Justicia de Madrid.</titulo><url_pdf szbytes="245474" szkbytes="240" pagina_inicial="127164" pagina_final="127171">https://www.boe.es/boe/dias/2026/09/29/pdfs/BOE-A-2026-20159.pdf</url_pdf><url_html>https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-20159</url_html><url_xml>https://www.boe.es/diario_boe/xml.php?id=BOE-A-2026-20159</url_xml></item>
+              <item><identificador>BOE-A-2026-20160</identificador><control>2026/14733</control><titulo>Acuerdo de 16 de septiembre de 2026, del Pleno del Consejo General del Poder Judicial, por el que se convoca la provisión de plaza de Magistrado/a de la Sala Cuarta del Tribunal Supremo, turno de especialistas.</titulo><url_pdf szbytes="246114" szkbytes="240" pagina_inicial="127172" pagina_final="127179">https://www.boe.es/boe/dias/2026/09/29/pdfs/BOE-A-2026-20160.pdf</url_pdf><url_html>https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-20160</url_html><url_xml>https://www.boe.es/diario_boe/xml.php?id=BOE-A-2026-20160</url_xml></item>
+            </epigrafe>
+            <epigrafe nombre="Personal al servicio del Consejo General del Poder Judicial">
+              <item><identificador>BOE-A-2026-20164</identificador><control>2026/14803</control><titulo>Acuerdo de 22 de septiembre de 2026, de la Comisión Permanente del Consejo General del Poder Judicial, por el que se convoca concurso para proveer puesto de trabajo en la Secretaría General.</titulo><url_pdf szbytes="263395" szkbytes="257" pagina_inicial="127204" pagina_final="127215">https://www.boe.es/boe/dias/2026/09/29/pdfs/BOE-A-2026-20164.pdf</url_pdf><url_html>https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-20164</url_html><url_xml>https://www.boe.es/diario_boe/xml.php?id=BOE-A-2026-20164</url_xml></item>
+            </epigrafe>
+          </departamento>
+        </seccion>
+        <seccion codigo="3" nombre="III. Otras disposiciones">
+          <departamento codigo="9562" nombre="MINISTERIO DE ASUNTOS EXTERIORES, UNIÓN EUROPEA Y COOPERACIÓN">
+            <epigrafe nombre="Convenios">
+              <item><identificador>BOE-A-2026-20205</identificador><control>2026/14623</control><titulo>Resolución de 14 de septiembre de 2026, de la Secretaría General Técnica, por la que se publica el Convenio entre la Embajada de España en Costa Rica y Viscofan Centroamérica Comercial, SA, para la celebración de la Fiesta Nacional de España.</titulo><url_pdf szbytes="221799" szkbytes="217" pagina_inicial="127443" pagina_final="127447">https://www.boe.es/boe/dias/2026/09/29/pdfs/BOE-A-2026-20205.pdf</url_pdf><url_html>https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-20205</url_html><url_xml>https://www.boe.es/diario_boe/xml.php?id=BOE-A-2026-20205</url_xml></item>
+              <item><identificador>BOE-A-2026-20211</identificador><control>2026/14633</control><titulo>Resolución de 16 de septiembre de 2026, de la Secretaría General Técnica, por la que se publica el Convenio entre la Embajada de España en Líbano y Nakhal &amp; CIE, para la celebración de la Fiesta Nacional de España.</titulo><url_pdf szbytes="221476" szkbytes="216" pagina_inicial="127473" pagina_final="127477">https://www.boe.es/boe/dias/2026/09/29/pdfs/BOE-A-2026-20211.pdf</url_pdf><url_html>https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-20211</url_html><url_xml>https://www.boe.es/diario_boe/xml.php?id=BOE-A-2026-20211</url_xml></item>
+            </epigrafe>
+          </departamento>
+        </seccion>
+        <seccion codigo="5A" nombre="V. Anuncios. - A. Contratación del Sector Público">
+          <departamento codigo="1220" nombre="CORTES GENERALES">
+            <item><identificador>BOE-B-2026-31510</identificador><titulo>Anuncio de formalización de contratos de: Mesa del Senado. Objeto: Servicios de gestión y asistencia técnica de viajes y visitas del Senado. Expediente: 06/2026.</titulo><url_pdf szbytes="224164" szkbytes="219" pagina_inicial="51010" pagina_final="51012">https://www.boe.es/boe/dias/2026/09/29/pdfs/BOE-B-2026-31510.pdf</url_pdf><url_html>https://www.boe.es/diario_boe/txt.php?id=BOE-B-2026-31510</url_html><url_xml>https://www.boe.es/diario_boe/xml.php?id=BOE-B-2026-31510</url_xml></item>
+          </departamento>
+        </seccion>
+      </diario>
+    </sumario>
+  </data>
+</response>

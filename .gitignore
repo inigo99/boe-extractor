@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.env
+data/
+mlruns/
+mlartifacts/
+.ipynb_checkpoints/
+
+# Notas locales, no se publican
+CLAUDE.md
+0[1-3]-*.md
