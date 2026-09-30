@@ -120,7 +120,7 @@ def parsear_sumario(xml: bytes) -> list[dict]:
                                 "titulo": item.findtext("titulo"),
                                 "pagina_inicial": _int(attr.get("pagina_inicial")),
                                 "pagina_final": _int(attr.get("pagina_final")),
-                                "pdf_kb": _int(attr.get("szkbytes")),
+                                "pdf_kb": _int(attr.get("szKBytes")),
                                 "url_pdf": pdf.text if pdf is not None else None,
                                 "url_html": item.findtext("url_html"),
                                 "url_xml": item.findtext("url_xml"),
