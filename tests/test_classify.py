@@ -99,6 +99,13 @@ CASOS = [
         None,
         None,
     ),
+    (
+        "2B",
+        "Personal funcionario",
+        "Orden de 29 de mayo de 2026, del Departamento de Justicia y Derechos Humanos, por la que se convoca la provisión de puesto de trabajo, por el sistema de libre designación, en el Servicio Común de Tramitación.",
+        None,
+        None,
+    ),
 ]
 
 

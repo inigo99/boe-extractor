@@ -38,9 +38,13 @@ Reglas:
 - No inventes ni completes con conocimiento general.
 - Importes en euros como número (1.250.000,50 euros → 1250000.5).
 - Fechas en formato AAAA-MM-DD.
-- Copia nombres de organismos y puestos tal como aparecen, sin abreviar.
+- organismo: el nombre tal como aparece, sin abreviar y sin la provincia entre paréntesis.
+- puesto: solo la denominación de la plaza o del cuerpo (sin escala, subescala ni grupo).
+- vinculo: docente_universitario para cuerpos docentes universitarios (catedráticos, titulares).
+- titulacion: solo el título académico exigido; null si el requisito no es una titulación.
 - plazas: una entrada por turno (libre, promocion_interna, discapacidad u otro) con su número.
-- Plazos: días y si son hábiles o naturales; 'desde' indica a partir de qué publicación se cuentan.
+- Plazos: días y tipo (hábiles o naturales) solo si el texto lo dice; si no, tipo null.
+  'desde' indica a partir de qué publicación se cuentan.
 - cpv: solo los códigos de 8 dígitos."""
 
 

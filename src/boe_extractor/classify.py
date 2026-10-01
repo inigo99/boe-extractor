@@ -26,6 +26,7 @@ _convocatoria = (
     )
     # Libre designación: provisión de puestos entre funcionarios, no acceso al empleo público.
     & (pl.col("epigrafe") != "Procedimientos de libre designación")
+    & ~_t.str.contains("libre designación")
 )
 _anuncio_local = _t.str.contains(
     r"ayuntamiento|diputació|consell (?:comarcal|insular)|cabildo|comarca|mancomunidad"
