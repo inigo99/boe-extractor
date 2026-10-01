@@ -89,11 +89,27 @@ def main() -> None:
     print(f"{docs.height} documentos → {out}. Fallos: {len(fallos)} (relanza para reintentar)")
 
 
+MAX_TOKENS_ENTRADA = 6144
+TOKENIZADOR = "Qwen/Qwen2.5-1.5B-Instruct"
+
+
+def recortar(textos: list[str], max_tokens: int = MAX_TOKENS_ENTRADA) -> list[str]:
+    """Recorta cada texto a max_tokens del tokenizador de Qwen (por el final). Misma regla para
+    etiquetar, entrenar y servir."""
+    from tokenizers import Tokenizer
+
+    tok = Tokenizer.from_pretrained(TOKENIZADOR)
+    out = []
+    for texto, enc in zip(textos, tok.encode_batch(textos), strict=True):
+        out.append(texto if len(enc.ids) <= max_tokens else texto[: enc.offsets[max_tokens - 1][1]])
+    return out
+
+
 def tokens() -> None:
     """boe-tokens: añade n_tokens (tokenizador de Qwen) y muestra la distribución por tipo."""
     from tokenizers import Tokenizer
 
-    tok = Tokenizer.from_pretrained("Qwen/Qwen2.5-1.5B-Instruct")
+    tok = Tokenizer.from_pretrained(TOKENIZADOR)
     path = DATA_DIR / "documents.parquet"
     docs = pl.read_parquet(path)
     n = [len(e.ids) for e in tok.encode_batch(docs["texto"].to_list())]
