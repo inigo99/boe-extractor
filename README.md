@@ -2,7 +2,7 @@
 
 Del BOE a JSON validado con un LLM pequeño ajustado con QLoRA.
 
-> Estado: semana 1 (datos). En construcción.
+> Estado: semana 3 (referencias y QLoRA). En construcción.
 
 ## Uso
 
@@ -30,3 +30,17 @@ publicará con licencia CC BY 4.0 citando al BOE como fuente.
   los desacuerdos (44) los decidió un humano. 30 documentos se anotaron a mano desde cero para medir el sesgo
   del pre-rellenado. `uv run boe-gold-final` aplica `data/gold/revision.jsonl` y genera
   `data/gold/gold_final.jsonl`, con las correcciones que lleva cada documento.
+
+## Evaluación
+
+```bash
+uv run boe-gold-final                               # gold revisado
+uv run boe-baseline                                 # reglas y Gemini → data/preds/
+uv run --group exp boe-eval data/preds/reglas.jsonl # métricas + MLflow (mlflow.db)
+uv run --group exp mlflow ui --backend-store-uri sqlite:///mlflow.db
+uv run boe-sft                                      # conversaciones para Colab → data/sft/
+```
+
+Modelo base y QLoRA: `notebooks/colab.ipynb` (T4 gratis; vLLM con decodificación restringida al
+esquema y Unsloth). Métricas: F1 por campo (similitud de tokens en texto libre), F1 micro/macro,
+% de JSON válido, tasa de alucinación (valores que no aparecen en el texto) y latencia.

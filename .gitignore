@@ -12,3 +12,4 @@ mlartifacts/
 # Notas locales, no se publican
 CLAUDE.md
 0[1-3]-*.md
+mlflow.db

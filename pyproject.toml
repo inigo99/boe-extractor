@@ -19,10 +19,16 @@ boe-docs = "boe_extractor.docs:main"
 boe-tokens = "boe_extractor.docs:tokens"
 boe-silver = "boe_extractor.label.silver:main"
 boe-gold-final = "boe_extractor.label.revision:main"
+boe-baseline = "boe_extractor.baselines:main"
+boe-eval = "boe_extractor.evaluate:main"
+boe-sft = "boe_extractor.train.sft:main"
 
 [dependency-groups]
 anotar = [
     "streamlit>=1.40",
+]
+exp = [
+    "mlflow>=3",
 ]
 dev = [
     "pytest>=8",
