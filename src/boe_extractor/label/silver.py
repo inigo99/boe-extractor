@@ -27,6 +27,8 @@ from boe_extractor.schemas import ESQUEMAS, SCHEMA_VERSION
 MODELO = "gemini-3.5-flash-lite"
 CORTE_TEST = pl.date(2026, 8, 1)  # entrenamiento: abr–jul; ago–sep queda para el gold
 MUESTRA = {"bases": None, "ayuda": None, "licitacion": 450, "anuncio_local": 300}  # None = todos
+MUESTRA_GOLD = {"bases": 50, "anuncio_local": 50, "ayuda": None, "licitacion": 100}
+SIN_PRELLENADO = 10  # por tipo: se anotan desde cero para medir el sesgo del pre-rellenado
 PILOTO = 5
 INTERVALO_S = 60 / 15
 LABELS = DATA_DIR / "labels"
@@ -52,15 +54,23 @@ def _grupo() -> pl.Expr:
     return pl.coalesce("subtipo", "tipo")
 
 
-def seleccionar(docs: pl.DataFrame, piloto: bool = False, seed: int = 42) -> pl.DataFrame:
-    """Muestra estratificada del periodo de entrenamiento, en orden estable."""
-    train = docs.filter(pl.col("fecha") < CORTE_TEST).with_columns(grupo=_grupo())
+def seleccionar(
+    docs: pl.DataFrame, piloto: bool = False, gold: bool = False, seed: int = 42
+) -> pl.DataFrame:
+    """Muestra estratificada en orden estable: abr–jul para silver, ago–sep para gold."""
+    periodo = pl.col("fecha") >= CORTE_TEST if gold else pl.col("fecha") < CORTE_TEST
+    base = docs.filter(periodo).with_columns(grupo=_grupo())
     partes = []
-    for grupo, n in MUESTRA.items():
-        g = train.filter(pl.col("grupo") == grupo).sort("id")
+    for grupo, n in (MUESTRA_GOLD if gold else MUESTRA).items():
+        g = base.filter(pl.col("grupo") == grupo).sort("id")
         n = PILOTO if piloto else n
         partes.append(g if n is None or n >= g.height else g.sample(n, seed=seed))
-    return pl.concat(partes)
+    out = pl.concat(partes)
+    if gold:  # los primeros SIN_PRELLENADO de cada tipo (orden aleatorio fijo) van sin propuesta
+        out = out.with_columns(
+            sin_prellenado=pl.int_range(pl.len()).shuffle(seed).over("tipo") < SIN_PRELLENADO
+        )
+    return out
 
 
 def entrada(doc: dict, texto: str) -> str:
@@ -105,6 +115,7 @@ def _llamar(client, modelo: str, tipo: str, prompt: str):
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--piloto", action="store_true")
+    ap.add_argument("--gold", action="store_true", help="pre-rellena el gold (ago–sep)")
     ap.add_argument("--modelo", default=MODELO)
     args = ap.parse_args(argv)
 
@@ -113,14 +124,16 @@ def main(argv: list[str] | None = None) -> None:
     _cargar_env()
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
     LABELS.mkdir(parents=True, exist_ok=True)
-    out = LABELS / (f"piloto_{args.modelo}.jsonl" if args.piloto else "silver.jsonl")
+    nombre = "gold_pre" if args.gold else "silver"
+    out = LABELS / (f"piloto_{args.modelo}.jsonl" if args.piloto else f"{nombre}.jsonl")
     hechos = (
         {json.loads(linea)["id"] for linea in out.read_text(encoding="utf-8").splitlines()}
         if out.exists()
         else set()
     )
 
-    muestra = seleccionar(pl.read_parquet(DATA_DIR / "documents.parquet"), piloto=args.piloto)
+    docs = pl.read_parquet(DATA_DIR / "documents.parquet")
+    muestra = seleccionar(docs, piloto=args.piloto, gold=args.gold)
     muestra = muestra.filter(~pl.col("id").is_in(list(hechos)))
     print(f"{len(hechos)} ya etiquetados, {muestra.height} pendientes → {out}", flush=True)
     textos = recortar(muestra["texto"].to_list())
@@ -141,6 +154,7 @@ def main(argv: list[str] | None = None) -> None:
                 "id": doc["id"],
                 "tipo": doc["tipo"],
                 "subtipo": doc["subtipo"],
+                "sin_prellenado": doc.get("sin_prellenado", False),
                 "schema_version": SCHEMA_VERSION,
                 "json": datos,
                 "valido": datos is not None,

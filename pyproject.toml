@@ -20,6 +20,9 @@ boe-tokens = "boe_extractor.docs:tokens"
 boe-silver = "boe_extractor.label.silver:main"
 
 [dependency-groups]
+anotar = [
+    "streamlit>=1.40",
+]
 dev = [
     "pytest>=8",
     "ruff>=0.6",

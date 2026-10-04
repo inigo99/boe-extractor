@@ -52,3 +52,16 @@ def test_validar():
     )
     assert malo is None and "procedimiento" in err
     assert validar("ayuda", "no es json")[0] is None
+
+
+def test_gold_solo_test_y_sin_prellenado():
+    g = seleccionar(_docs(), gold=True)
+    assert g["fecha"].min() >= date(2026, 8, 1)
+    n = dict(g.group_by("grupo").len().iter_rows())
+    assert n == {"bases": 50, "anuncio_local": 50, "ayuda": 150, "licitacion": 100}
+    assert dict(g.group_by("tipo").agg(pl.col("sin_prellenado").sum()).iter_rows()) == {
+        "convocatoria": 10,
+        "ayuda": 10,
+        "licitacion": 10,
+    }
+    assert g.equals(seleccionar(_docs(), gold=True))
