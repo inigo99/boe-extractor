@@ -18,6 +18,7 @@ boe-classify = "boe_extractor.classify:main"
 boe-docs = "boe_extractor.docs:main"
 boe-tokens = "boe_extractor.docs:tokens"
 boe-silver = "boe_extractor.label.silver:main"
+boe-gold-final = "boe_extractor.label.revision:main"
 
 [dependency-groups]
 anotar = [
