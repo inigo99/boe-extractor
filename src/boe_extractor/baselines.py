@@ -142,8 +142,8 @@ def licitacion(doc: dict, texto: str) -> dict:
     dur = re.search(r"(\d+) meses", tras(texto, r"Duración del contrato") or "")
     fecha = normalize.fecha(tras(texto, r"Plazo para la recepción de ofertas") or "")
     return {
-        "organo_contratacion": tras(texto, r"1\.1\) Nombre"),
-        "objeto": tras(texto, r"Descripción de la licitación"),
+        "organo_contratacion": tras(texto, r"1\.1\) Nombre") or doc["departamento"].title(),
+        "objeto": tras(texto, r"Descripción de la licitación") or doc["titulo"],
         "tipo_contrato": primero(
             texto,
             {
@@ -170,9 +170,13 @@ REGLAS = {"convocatoria": convocatoria, "ayuda": ayuda, "licitacion": licitacion
 
 def reglas(doc: dict, texto: str) -> dict:
     t0 = time.perf_counter()
-    salida = REGLAS[doc["tipo"]](doc, texto)
-    datos = ESQUEMAS[doc["tipo"]].model_validate(salida).model_dump(mode="json")
-    return {"id": doc["id"], "json": datos, "valido": True,
+    try:  # una regla que no casa no debe tumbar la ejecución: cuenta como JSON inválido
+        salida = REGLAS[doc["tipo"]](doc, texto)
+        datos = ESQUEMAS[doc["tipo"]].model_validate(salida).model_dump(mode="json")
+    except Exception as e:
+        print(f"{doc['id']}: {str(e)[:200]}")
+        datos = None
+    return {"id": doc["id"], "json": datos, "valido": datos is not None,
             "latencia_ms": (time.perf_counter() - t0) * 1000}  # fmt: skip
 
 

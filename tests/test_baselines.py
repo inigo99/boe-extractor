@@ -40,3 +40,15 @@ def test_reglas_anuncio_local():
         j["plazo_solicitudes"]["dias"] == 15
         and j["plazo_solicitudes"]["desde"] == "publicacion_boe"
     )
+
+
+def test_reglas_no_revientan_con_texto_vacio():
+    d = {
+        "id": "x",
+        "tipo": "licitacion",
+        "subtipo": None,
+        "titulo": "Anuncio de licitación",
+        "departamento": "MINISTERIO DE DEFENSA",
+    }
+    r = reglas(d, "")
+    assert r["valido"] and r["json"]["organo_contratacion"] == "Ministerio De Defensa"
