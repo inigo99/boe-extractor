@@ -54,15 +54,16 @@ def main() -> None:
         use_gradient_checkpointing="unsloth",
         random_state=3407,
     )
-    ds = load_dataset(
-        "json", data_files={p: str(args.datos / f"{p}.jsonl") for p in ("train", "val")}
-    ).map(lambda r: {"text": tok.apply_chat_template(r["messages"], tokenize=False)})
+    # Sin evaluación durante el entrenamiento: con 8k tokens los logits en fp32 no caben en la
+    # T4 (OOM). La medida que cuenta es boe-eval sobre el gold.
+    ds = load_dataset("json", data_files=str(args.datos / "train.jsonl"), split="train").map(
+        lambda r: {"text": tok.apply_chat_template(r["messages"], tokenize=False)}
+    )
     ckpt = args.salida / "checkpoints"
     trainer = SFTTrainer(
         model=model,
         tokenizer=tok,
-        train_dataset=ds["train"],
-        eval_dataset=ds["val"],
+        train_dataset=ds,
         args=SFTConfig(
             dataset_text_field="text",
             max_seq_length=MAX_LEN,
@@ -76,8 +77,6 @@ def main() -> None:
             fp16=not torch.cuda.is_bf16_supported(),
             bf16=torch.cuda.is_bf16_supported(),
             logging_steps=10,
-            eval_strategy="steps",
-            eval_steps=50,
             save_steps=50,
             save_total_limit=2,
             output_dir=str(ckpt),

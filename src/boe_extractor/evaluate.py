@@ -220,7 +220,7 @@ def main() -> None:
             h = json.loads(args.historial.read_text())
             mlflow.log_params(h["hiper"])
             for x in h["log"]:
-                for k in ("loss", "eval_loss"):
+                for k in ("loss",):
                     if k in x:
                         mlflow.log_metric(f"train.{k}", x[k], step=x["step"])
     print(tabla(m))
