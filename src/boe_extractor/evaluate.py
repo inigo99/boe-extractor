@@ -29,6 +29,9 @@ TEXTO = {
     "bases_reguladoras", "organo_contratacion",
 }  # fmt: skip
 LISTAS = {"cpv", "plazas"}
+# Resúmenes en texto libre: la paráfrasis no es un error, así que se reportan aparte
+# (f1_texto_libre) y no entran en el F1 micro/macro.
+TEXTO_LIBRE = {"objeto", "beneficiarios"}
 # Campos cuyo valor debería poder encontrarse literalmente en el texto (para alucinaciones)
 LITERALES = TEXTO | {"cpv", "lugar_ejecucion_nuts", "bdns_id"}
 IMPORTES = {"tasa_eur", "cuantia_total_eur", "importe_max_beneficiario_eur",
@@ -158,12 +161,15 @@ def evaluar(gold: dict[str, dict], preds: dict[str, dict], textos: dict[str, str
         c: {"f1": f1(*v), "exacto": exactos[c][0] / exactos[c][1], "tp_fp_fn": v}
         for c, v in sorted(cont.items())
     }
-    total = [sum(v[k] for v in cont.values()) for k in range(3)]
+    libre = {c: v for c, v in cont.items() if c.split("/")[1] in TEXTO_LIBRE}
+    resto = {c: v for c, v in cont.items() if c not in libre}
+    total = [sum(v[k] for v in resto.values()) for k in range(3)]
     lat = [p["latencia_ms"] for p in preds.values() if p.get("latencia_ms") is not None]
     return {
         "n_docs": len(gold),
         "f1_micro": f1(*total),
-        "f1_macro": statistics.mean(c["f1"] for c in por_campo.values()),
+        "f1_macro": statistics.mean(por_campo[c]["f1"] for c in resto),
+        "f1_texto_libre": f1(*[sum(v[k] for v in libre.values()) for k in range(3)]),
         "json_valido": sum(bool(preds.get(i, {}).get("valido")) for i in gold) / len(gold),
         "alucinacion": aluc[0] / aluc[1] if aluc[1] else 0.0,
         "latencia_p50_ms": statistics.median(lat) if lat else None,

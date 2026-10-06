@@ -1,6 +1,6 @@
 """QLoRA con Unsloth sobre el silver (en Colab, GPU T4).
 
-Uso: python -m boe_extractor.train.qlora --datos sft/ --salida qlora-v1/
+Uso: python -m boe_extractor.train.qlora --datos sft/ --salida qlora-v2/
 
 Guarda checkpoints cada 50 pasos en <salida>/checkpoints y, si la sesión de Colab se corta,
 al relanzar sigue desde el último. Al terminar deja el adaptador en <salida>/adaptador y la
@@ -16,7 +16,7 @@ from pathlib import Path
 from boe_extractor.infer import MAX_LEN, MODELO
 
 HIPER = {
-    "r": 16, "lora_alpha": 16, "lr": 2e-4, "epochs": 1, "batch": 1, "grad_accum": 8,
+    "r": 16, "lora_alpha": 16, "lr": 2e-4, "epochs": 2, "batch": 1, "grad_accum": 8,
 }  # fmt: skip
 
 

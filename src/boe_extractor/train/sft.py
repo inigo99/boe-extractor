@@ -4,7 +4,8 @@ Uso (en tu PC, donde está data/): uv run boe-sft → data/sft/{train,val,gold}.
 Sube data/sft/ a Google Drive (MyDrive/boe-extractor/sft/) para entrenar e inferir en Colab.
 
 El prompt es el de Gemini (mismas instrucciones y mismo formato de entrada) más el esquema JSON
-del tipo, para que el modelo base sin ajustar sepa qué campos rellenar.
+del tipo, para que el modelo base sin ajustar sepa qué campos rellenar. Las etiquetas del
+silver pasan por label/convenciones.py, igual que el gold.
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ import hashlib
 import json
 
 from boe_extractor.fetch import DATA_DIR
+from boe_extractor.label.convenciones import alinear
 from boe_extractor.label.silver import INSTRUCCIONES, entrada
 from boe_extractor.schemas import ESQUEMAS
 
@@ -64,7 +66,8 @@ def main() -> None:
             salidas["gold"].append(ejemplo(doc, texto))
         else:
             parte = "val" if es_val(doc["id"]) else "train"
-            salidas[parte].append(ejemplo(doc, texto, silver[doc["id"]]["json"]))
+            salida = alinear(doc["tipo"], silver[doc["id"]]["json"], doc["titulo"], texto)
+            salidas[parte].append(ejemplo(doc, texto, salida))
     SFT.mkdir(exist_ok=True)
     for parte, filas in salidas.items():
         (SFT / f"{parte}.jsonl").write_text(

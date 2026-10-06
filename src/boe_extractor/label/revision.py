@@ -6,7 +6,7 @@ data/gold/revision.jsonl tiene una fila por propuesta de Claude:
 {"n", "ids", "cambios": {campo|campo.subcampo: valor} | null, "motivo", "decision"}
 decision: "aceptada" | "rechazada" (la decide Íñigo), "convencion" (regla acordada, se aplica)
 o "descartar" (los ids salen del gold). Además se normaliza el formato: espacios y comas
-sobrantes, y organismos EN MAYÚSCULAS pasan a tipo título.
+sobrantes, organismos EN MAYÚSCULAS pasan a tipo título y se aplican label/convenciones.py.
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ import copy
 import json
 
 from boe_extractor.label.annotate import GOLD, guardar, leer_jsonl
+from boe_extractor.label.convenciones import alinear
 from boe_extractor.schemas import ESQUEMAS
 
 REVISION = GOLD.with_name("revision.jsonl")
@@ -58,7 +59,10 @@ def aplicar(datos: dict, cambios: dict) -> dict:
     return datos
 
 
-def construir(gold: dict[str, dict], revision: list[dict]) -> list[dict]:
+def construir(
+    gold: dict[str, dict], revision: list[dict], docs: dict[str, tuple[str, str]] | None = None
+) -> list[dict]:
+    """docs: id → (título, texto recortado), para aplicar las convenciones de convenciones.py."""
     descartes = {i for r in revision if r["decision"] == "descartar" for i in r["ids"]}
     aplicadas: dict[str, list] = {}
     final = {i: copy.deepcopy(f) for i, f in gold.items() if not f["descartado"]}
@@ -73,7 +77,13 @@ def construir(gold: dict[str, dict], revision: list[dict]) -> list[dict]:
     for i, f in sorted(final.items()):
         if i in descartes:
             continue
-        datos = ESQUEMAS[f["tipo"]].model_validate(formato(f["json"])).model_dump(mode="json")
+        datos = formato(f["json"])
+        if docs and i in docs:
+            alineado = alinear(f["tipo"], datos, *docs[i])
+            if alineado != datos:
+                aplicadas.setdefault(i, []).append("convenciones")
+            datos = alineado
+        datos = ESQUEMAS[f["tipo"]].model_validate(datos).model_dump(mode="json")
         filas.append(f | {"json": datos, "revision": aplicadas.get(i, [])})
     return filas
 
@@ -87,7 +97,16 @@ def main() -> None:
     if pendientes:
         raise SystemExit(f"Faltan decisiones: {pendientes}")
     FINAL.unlink(missing_ok=True)
-    filas = construir(leer_jsonl(GOLD), leer_lineas(REVISION))
+    import polars as pl
+
+    from boe_extractor.docs import recortar
+    from boe_extractor.fetch import DATA_DIR
+
+    gold = leer_jsonl(GOLD)
+    d = pl.read_parquet(DATA_DIR / "documents.parquet").filter(pl.col("id").is_in(list(gold)))
+    textos = recortar(d["texto"].to_list())
+    docs = {i: (t, x) for i, t, x in zip(d["id"], d["titulo"], textos, strict=True)}
+    filas = construir(gold, leer_lineas(REVISION), docs)
     for f in filas:
         guardar(f, FINAL)
     print(f"{len(filas)} documentos → {FINAL}")
