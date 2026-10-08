@@ -1,6 +1,6 @@
 """QLoRA con Unsloth sobre el silver (en Colab, GPU T4).
 
-Uso: python -m boe_extractor.train.qlora --datos sft/ --salida qlora-v2/
+Uso: python -m boe_extractor.train.qlora --datos sft/ --salida qlora-v3/
 
 Guarda checkpoints cada 50 pasos en <salida>/checkpoints y, si la sesión de Colab se corta,
 al relanzar sigue desde el último. Al terminar deja el adaptador en <salida>/adaptador y la
