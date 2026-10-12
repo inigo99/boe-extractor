@@ -2,7 +2,7 @@
 
 Del BOE a JSON validado con un LLM pequeño ajustado con QLoRA.
 
-> Estado: semana 4 (iteración, QLoRA v2). En construcción.
+> Estado: semana 4 (iteración, QLoRA v3). En construcción.
 
 ## Uso
 
@@ -52,12 +52,20 @@ F1 micro sin los campos de texto libre (objeto, beneficiarios), que van en su pr
 | Sistema | F1 micro | F1 macro | F1 micro, 30 docs anotados desde cero | Texto libre | JSON válido | Alucinación |
 |---|---|---|---|---|---|---|
 | Reglas (regex) | 0,840 | 0,709 | 0,852 | 0,650 | 100 % | 1,0 % |
-| Qwen2.5-1.5B base + decodificación restringida | 0,697 | 0,632 | 0,663 | 0,717 | 99,2 % | 12,2 % |
+| Qwen2.5-1.5B base + decodificación restringida | 0,697 | 0,631 | 0,659 | 0,717 | 99,2 % | 12,2 % |
 | Qwen2.5-1.5B + QLoRA v1 | 0,930 | 0,863 | 0,864 | 0,832 | 100 % | 0,9 % |
-| **Qwen2.5-1.5B + QLoRA v2** | **0,947** | **0,882** | **0,900** | 0,844 | **100 %** | **0,9 %** |
+| Qwen2.5-1.5B + QLoRA v2 | 0,947 | 0,882 | 0,900 | 0,844 | 100 % | 0,9 % |
+| **Qwen2.5-1.5B + QLoRA v3** | **0,957** | **0,919** | **0,932** | 0,842 | **100 %** | **1,0 %** |
 | Gemini 3.5 Flash-Lite (API) | 0,963* | 0,960* | 0,910 | 0,964* | 100 % | 0,9 % |
 
 \* El gold se pre-rellenó con Gemini y eso infla su nota; la columna de los 30 documentos anotados
-desde cero es la comparación justa. v1: r=16, 1 época sobre ~1.400 etiquetas silver (~50 min en una
-T4 gratis). v2: mismas etiquetas pasadas por las convenciones del gold (`label/convenciones.py`) y
-2 épocas. Latencia no comparable todavía (vLLM en lote frente a API secuencial).
+desde cero es la comparación justa (con solo 30 documentos, diferencias de 2 puntos no son
+concluyentes). Gemini se evalúa tal cual; el modelo pequeño aprende además las convenciones del
+gold, y parte de su ventaja viene de ahí.
+
+- v1: r=16, 1 época sobre ~1.400 etiquetas silver de Gemini (~50 min en una T4 gratis de Colab).
+- v2: etiquetas pasadas por las convenciones del gold (`label/convenciones.py`) y 2 épocas.
+- v3: más convenciones (plazo «de un mes», plazos con solo fecha final, plazas sumadas por turno,
+  puesto vacío si hay varios).
+
+Latencia no comparable todavía (vLLM en lote frente a API secuencial).
