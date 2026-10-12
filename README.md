@@ -41,6 +41,14 @@ uv run --group exp mlflow ui --backend-store-uri sqlite:///mlflow.db
 uv run boe-sft                                      # conversaciones para Colab → data/sft/
 ```
 
+En CPU (modelo GGUF exportado con la parte 4 del notebook):
+
+```bash
+uv run --with llama-cpp-python==0.3.19 --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
+  boe-infer-cpu --modelo data/modelos/<modelo>.gguf --salida data/preds/<nombre>-cpu.jsonl --limite 30
+uv run --group exp boe-eval data/preds/<nombre>-cpu.jsonl --solo-predichos
+```
+
 Modelo base y QLoRA: `notebooks/colab.ipynb` (T4 gratis; vLLM con decodificación restringida al
 esquema y Unsloth). Métricas: F1 por campo (similitud de tokens en texto libre), F1 micro/macro,
 % de JSON válido, tasa de alucinación (valores que no aparecen en el texto) y latencia.

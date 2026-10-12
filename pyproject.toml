@@ -22,6 +22,7 @@ boe-gold-final = "boe_extractor.label.revision:main"
 boe-baseline = "boe_extractor.baselines:main"
 boe-eval = "boe_extractor.evaluate:main"
 boe-sft = "boe_extractor.train.sft:main"
+boe-infer-cpu = "boe_extractor.infer_cpu:main"
 
 [dependency-groups]
 anotar = [

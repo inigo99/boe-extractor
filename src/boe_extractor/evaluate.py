@@ -193,6 +193,9 @@ def main() -> None:
     ap.add_argument("preds", type=Path)
     ap.add_argument("--sistema", help="nombre en MLflow (por defecto, el del fichero)")
     ap.add_argument("--historial", type=Path, help="historial.json del QLoRA, para MLflow")
+    ap.add_argument(
+        "--solo-predichos", action="store_true", help="evalúa solo los ids con predicción"
+    )
     args = ap.parse_args()
     import mlflow
     import polars as pl
@@ -201,6 +204,8 @@ def main() -> None:
     from boe_extractor.schemas import SCHEMA_VERSION
 
     gold, preds = leer(GOLD_FINAL), leer(args.preds)
+    if args.solo_predichos:
+        gold = {i: g for i, g in gold.items() if i in preds}
     docs = pl.read_parquet(DATA_DIR / "documents.parquet").filter(pl.col("id").is_in(list(gold)))
     textos = dict(zip(docs["id"], recortar(docs["texto"].to_list()), strict=True))
     sistema = args.sistema or args.preds.stem
