@@ -19,8 +19,10 @@ El XML original queda en `data/raw/sumarios/` como caché; repetir el comando no
 ## Datos
 
 Fuente: [API de datos abiertos del BOE](https://www.boe.es/datosabiertos/). Reutilización sujeta a sus
-[condiciones](https://www.boe.es/informacion/aviso_legal/index.php#reutilizacion). El dataset derivado se
-publicará con licencia CC BY 4.0 citando al BOE como fuente.
+[condiciones](https://www.boe.es/informacion/aviso_legal/index.php#reutilizacion). El dataset derivado
+(textos recortados + etiquetas silver y gold, `uv run boe-sft` → `data/hf/`) está en Hugging Face,
+[`<tu-usuario>/boe-extractor-dataset`](https://huggingface.co/datasets/<tu-usuario>/boe-extractor-dataset),
+con licencia CC BY 4.0 citando al BOE como fuente.
 
 ## Etiquetas
 

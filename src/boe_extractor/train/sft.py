@@ -2,6 +2,7 @@
 
 Uso (en tu PC, donde está data/): uv run boe-sft → data/sft/{train,val,gold}.jsonl
 Sube data/sft/ a Google Drive (MyDrive/boe-extractor/sft/) para entrenar e inferir en Colab.
+Escribe también data/hf/{train,validation,test}.jsonl, el dataset publicado en Hugging Face.
 
 El prompt es el de Gemini (mismas instrucciones y mismo formato de entrada) más el esquema JSON
 del tipo, para que el modelo base sin ajustar sepa qué campos rellenar. Las etiquetas del
@@ -19,6 +20,7 @@ from boe_extractor.label.silver import INSTRUCCIONES, entrada
 from boe_extractor.schemas import ESQUEMAS
 
 SFT = DATA_DIR / "sft"
+HF = DATA_DIR / "hf"
 VAL = 0.05  # fracción del silver para la pérdida de validación
 
 
@@ -43,6 +45,14 @@ def ejemplo(doc: dict, texto: str, salida: dict | None = None) -> dict:
     return {"id": doc["id"], "tipo": doc["tipo"], "messages": messages}
 
 
+def fila_hf(doc: dict, texto: str, salida: dict, etiqueta: str) -> dict:
+    """Fila plana del dataset publicado. El JSON va como cadena: su forma depende del tipo."""
+    return {k: doc[k] for k in ("id", "tipo", "subtipo", "titulo", "departamento", "url_html")} | {
+        "fecha": str(doc["fecha"]), "texto": texto,
+        "json": json.dumps(salida, ensure_ascii=False), "etiqueta": etiqueta,
+    }  # fmt: skip
+
+
 def es_val(doc_id: str) -> bool:
     """Partición estable: no depende del orden ni de la semilla."""
     return int(hashlib.md5(doc_id.encode()).hexdigest(), 16) % 1000 < VAL * 1000
@@ -61,19 +71,27 @@ def main() -> None:
     )
     textos = recortar(docs["texto"].to_list())
     salidas: dict[str, list[dict]] = {"train": [], "val": [], "gold": []}
+    hf: dict[str, list[dict]] = {"train": [], "validation": [], "test": []}
     for doc, texto in zip(docs.iter_rows(named=True), textos, strict=True):
         if doc["id"] in gold:
+            g = gold[doc["id"]]
             salidas["gold"].append(ejemplo(doc, texto))
+            etiqueta = "revisada" if g["prellenado"] else "desde_cero"
+            hf["test"].append(fila_hf(doc, texto, g["json"], etiqueta))
         else:
             parte = "val" if es_val(doc["id"]) else "train"
             salida = alinear(doc["tipo"], silver[doc["id"]]["json"], doc["titulo"], texto)
             salidas[parte].append(ejemplo(doc, texto, salida))
-    SFT.mkdir(exist_ok=True)
-    for parte, filas in salidas.items():
-        (SFT / f"{parte}.jsonl").write_text(
-            "".join(json.dumps(f, ensure_ascii=False) + "\n" for f in filas), encoding="utf-8"
-        )
-    print({k: len(v) for k, v in salidas.items()}, "→", SFT)
+            hf["validation" if parte == "val" else "train"].append(
+                fila_hf(doc, texto, salida, "silver")
+            )
+    for carpeta, partes in ((SFT, salidas), (HF, hf)):
+        carpeta.mkdir(exist_ok=True)
+        for parte, filas in partes.items():
+            (carpeta / f"{parte}.jsonl").write_text(
+                "".join(json.dumps(f, ensure_ascii=False) + "\n" for f in filas), encoding="utf-8"
+            )
+        print({k: len(v) for k, v in partes.items()}, "→", carpeta)
 
 
 if __name__ == "__main__":
