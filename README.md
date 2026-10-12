@@ -2,7 +2,7 @@
 
 Del BOE a JSON validado con un LLM pequeño ajustado con QLoRA.
 
-> Estado: semana 4 (iteración, QLoRA v3). En construcción.
+> Estado: semana 4 terminada (QLoRA v3 + GGUF para CPU). En construcción.
 
 ## Uso
 
@@ -76,4 +76,14 @@ gold, y parte de su ventaja viene de ahí.
 - v3: más convenciones (plazo «de un mes», plazos con solo fecha final, plazas sumadas por turno,
   puesto vacío si hay varios).
 
-Latencia no comparable todavía (vLLM en lote frente a API secuencial).
+### En CPU (GGUF q4_k_m, llama.cpp), sobre los 30 documentos anotados desde cero
+
+| Sistema | F1 micro | Texto libre | Alucinación | Latencia p50 / p95 por documento |
+|---|---|---|---|---|
+| QLoRA v3 en GPU (vLLM, fp16) | 0,932 | 0,718 | 1,3 % | — (en lote) |
+| **QLoRA v3 en CPU (GGUF q4_k_m, ~1 GB)** | **0,924** | 0,702 | 0,7 % | 32 s / 59 s |
+| Gemini 3.5 Flash-Lite (API) | 0,910 | 0,743 | 0,7 % | 1,2 s / 1,5 s |
+
+Cuantizar a 4 bits cuesta menos de un punto de F1. En CPU tarda ~30 s por documento (entradas de
+~7.000 tokens), suficiente para procesar el BOE del día (~200 documentos candidatos, ~1,5 h) en un
+proceso por lotes sin GPU ni API de pago.
