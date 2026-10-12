@@ -39,9 +39,12 @@ jobs:
           test -f "$MODELO" || curl -fL -o "$MODELO" \
             "https://huggingface.co/${{ vars.MODELO_HF }}/resolve/main/${{ vars.MODELO_GGUF }}"
       - name: Extraer el BOE del día
+        # llama-cpp-python se compila desde PyPI (la rueda Linux del índice CPU es para musl).
+        # La compilación (~5 min) queda en la caché de uv para las siguientes ejecuciones.
+        env:
+          CMAKE_ARGS: -DGGML_NATIVE=OFF -DGGML_AVX=ON -DGGML_AVX2=ON -DGGML_FMA=ON -DGGML_F16C=ON
         run: |
           uv run --with llama-cpp-python==0.3.19 \
-            --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
             boe-diario --modelo "$MODELO" --web web ${{ inputs.fecha && format('--fecha {0}', inputs.fecha) || '' }}
       - name: Publicar en gh-pages
         working-directory: web
