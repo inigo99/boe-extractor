@@ -1,0 +1,53 @@
+name: Diario
+
+on:
+  schedule:
+    - cron: "15 6 * * 1-6" # 8:15 en horario de verano peninsular (7:15 en invierno)
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: "Día AAAAMMDD (vacío = hoy)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: diario
+  cancel-in-progress: false
+
+jobs:
+  diario:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      MODELO: modelos/${{ vars.MODELO_GGUF }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rama gh-pages en web/
+        run: |
+          git fetch origin gh-pages:gh-pages && git worktree add web gh-pages \
+            || git worktree add --orphan -b gh-pages web
+      - uses: astral-sh/setup-uv@v6
+      - uses: actions/cache@v4
+        with:
+          path: modelos
+          key: gguf-${{ vars.MODELO_HF }}-${{ vars.MODELO_GGUF }}
+      - name: Descargar el modelo de Hugging Face
+        run: |
+          mkdir -p modelos
+          test -f "$MODELO" || curl -fL -o "$MODELO" \
+            "https://huggingface.co/${{ vars.MODELO_HF }}/resolve/main/${{ vars.MODELO_GGUF }}"
+      - name: Extraer el BOE del día
+        run: |
+          uv run --with llama-cpp-python==0.3.19 \
+            --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
+            boe-diario --modelo "$MODELO" --web web ${{ inputs.fecha && format('--fecha {0}', inputs.fecha) || '' }}
+      - name: Publicar en gh-pages
+        working-directory: web
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "BOE ${{ inputs.fecha || 'del día' }}"
+          git push origin gh-pages
