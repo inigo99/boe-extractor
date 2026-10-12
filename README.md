@@ -85,5 +85,13 @@ gold, y parte de su ventaja viene de ahí.
 | Gemini 3.5 Flash-Lite (API) | 0,910 | 0,743 | 0,7 % | 1,2 s / 1,5 s |
 
 Cuantizar a 4 bits cuesta menos de un punto de F1. En CPU tarda ~30 s por documento (entradas de
-~7.000 tokens), suficiente para procesar el BOE del día (~200 documentos candidatos, ~1,5 h) en un
-proceso por lotes sin GPU ni API de pago.
+~7.000 tokens), suficiente para procesar el BOE del día (mediana de 43 documentos candidatos, unos
+25 min) en un proceso por lotes sin GPU ni API de pago.
+
+## Proceso diario
+
+`.github/workflows/diario.yml` se ejecuta de lunes a sábado a las 8:15 (hora peninsular): descarga
+el sumario del BOE, clasifica los candidatos, extrae cada uno con el modelo GGUF en la CPU del
+runner (`boe-diario`) y publica `datos/AAAA-MM-DD.jsonl` y una página con las tablas del día en
+GitHub Pages (rama `gh-pages`). El modelo se descarga de Hugging Face (variables del repo
+`MODELO_HF` y `MODELO_GGUF`) y se guarda en la caché de Actions.

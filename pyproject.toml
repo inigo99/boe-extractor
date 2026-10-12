@@ -23,6 +23,7 @@ boe-baseline = "boe_extractor.baselines:main"
 boe-eval = "boe_extractor.evaluate:main"
 boe-sft = "boe_extractor.train.sft:main"
 boe-infer-cpu = "boe_extractor.infer_cpu:main"
+boe-diario = "boe_extractor.diario:main"
 
 [dependency-groups]
 anotar = [

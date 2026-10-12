@@ -13,3 +13,5 @@ mlartifacts/
 CLAUDE.md
 0[1-3]-*.md
 mlflow.db
+web/
+modelos/
