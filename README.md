@@ -1,8 +1,40 @@
 # boe-extractor
 
-Del BOE a JSON validado con un LLM pequeño ajustado con QLoRA.
+Del **Boletín Oficial del Estado** a **JSON validado** con un LLM pequeño (Qwen2.5-1.5B) ajustado
+con QLoRA, que corre en CPU y procesa el BOE de cada día sin GPU ni API de pago.
 
-> Estado: semana 4 terminada (QLoRA v3 + GGUF para CPU). En construcción.
+- **Web diaria**: [inigo99.github.io/boe-extractor](https://inigo99.github.io/boe-extractor/):
+  empleo público, ayudas y licitaciones del BOE de hoy, en tablas y en JSONL.
+- **Modelo** (GGUF, ~1 GB): [huggingface.co/inigo99/boe-extractor](https://huggingface.co/inigo99/boe-extractor)
+- **Dataset** (1.492 silver + 262 gold): [huggingface.co/datasets/inigo99/boe-extractor-dataset](https://huggingface.co/datasets/inigo99/boe-extractor-dataset)
+
+| | F1 micro (30 docs anotados a mano) | Coste por documento |
+|---|---|---|
+| Reglas (regex) | 0,852 | — |
+| Qwen2.5-1.5B sin ajustar | 0,659 | — |
+| **Qwen2.5-1.5B + QLoRA, 4 bits en CPU** | **0,924** | 32 s de CPU, 0 € |
+| Gemini 3.5 Flash-Lite (API, el «profesor») | 0,910 | 1,2 s, de pago |
+
+## Cómo funciona
+
+```
+API BOE ─► sumario diario ─► clasificador (reglas) ─► convocatoria · ayuda · licitación
+                                                        │
+          Gemini (silver) + convenciones ──► QLoRA (Unsloth, T4 de Colab) ──► GGUF q4_k_m
+                                                        │
+     gold revisado (262) ──► boe-eval + MLflow     llama.cpp en CPU, salida restringida al esquema
+                                                        │
+                              GitHub Actions diario ─► GitHub Pages · API FastAPI
+```
+
+1. **Datos** (`fetch`, `classify`, `docs`): sumarios y documentos del BOE con caché y 1 petición/s;
+   reglas que eligen los candidatos (sin la sección II.A, de datos personales).
+2. **Etiquetas** (`label/`): esquemas Pydantic por tipo; silver con Gemini y salida forzada al
+   esquema; gold revisado con una herramienta Streamlit; convenciones comunes a ambos.
+3. **Modelo** (`train/`, `notebooks/colab.ipynb`): QLoRA sobre Qwen2.5-1.5B-Instruct, inferencia con
+   vLLM y exportación a GGUF.
+4. **Evaluación** (`evaluate.py`): F1 por campo, JSON válido, alucinaciones y latencia; todo en MLflow.
+5. **Servir** (`diario.py`, `api.py`): proceso diario en GitHub Actions y API HTTP.
 
 ## Uso
 
@@ -21,7 +53,7 @@ El XML original queda en `data/raw/sumarios/` como caché; repetir el comando no
 Fuente: [API de datos abiertos del BOE](https://www.boe.es/datosabiertos/). Reutilización sujeta a sus
 [condiciones](https://www.boe.es/informacion/aviso_legal/index.php#reutilizacion). El dataset derivado
 (textos recortados + etiquetas silver y gold, `uv run boe-sft` → `data/hf/`) está en Hugging Face,
-[`<tu-usuario>/boe-extractor-dataset`](https://huggingface.co/datasets/<tu-usuario>/boe-extractor-dataset),
+[`inigo99/boe-extractor-dataset`](https://huggingface.co/datasets/inigo99/boe-extractor-dataset),
 con licencia CC BY 4.0 citando al BOE como fuente.
 
 ## Etiquetas

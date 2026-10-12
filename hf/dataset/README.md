@@ -29,7 +29,7 @@ configs:
 
 Disposiciones del **Boletín Oficial del Estado** (2026) emparejadas con su extracción en **JSON**
 según un esquema por tipo de documento. Es el dataset con el que se entrenó y evaluó el modelo
-[`<tu-usuario>/boe-extractor`](https://huggingface.co/<tu-usuario>/boe-extractor).
+[`inigo99/boe-extractor`](https://huggingface.co/inigo99/boe-extractor).
 
 Código y proceso completo: [github.com/inigo99/boe-extractor](https://github.com/inigo99/boe-extractor).
 
@@ -75,7 +75,7 @@ import json
 
 from datasets import load_dataset
 
-ds = load_dataset("<tu-usuario>/boe-extractor-dataset")
+ds = load_dataset("inigo99/boe-extractor-dataset")
 fila = ds["test"][0]
 datos = json.loads(fila["json"])
 ```

@@ -5,6 +5,8 @@ language:
 base_model: Qwen/Qwen2.5-1.5B-Instruct
 pipeline_tag: text-generation
 library_name: gguf
+datasets:
+  - inigo99/boe-extractor-dataset
 tags:
   - gguf
   - llama.cpp
@@ -24,7 +26,9 @@ Modelo pequeño que convierte disposiciones del **Boletín Oficial del Estado (B
 validado contra un esquema**. Es un [Qwen2.5-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct)
 ajustado con QLoRA y cuantizado a 4 bits (~1 GB) para ejecutarse en CPU con llama.cpp.
 
-Código, datos de evaluación y proceso completo: [github.com/inigo99/boe-extractor](https://github.com/inigo99/boe-extractor).
+Código y proceso completo: [github.com/inigo99/boe-extractor](https://github.com/inigo99/boe-extractor).
+Datos de entrenamiento y evaluación: [inigo99/boe-extractor-dataset](https://huggingface.co/datasets/inigo99/boe-extractor-dataset).
+Resultado diario: [inigo99.github.io/boe-extractor](https://inigo99.github.io/boe-extractor/).
 
 ## Qué extrae
 
@@ -55,7 +59,7 @@ from boe_extractor.docs import recortar
 from boe_extractor.infer_cpu import cargar, extraer
 from boe_extractor.train.sft import ejemplo
 
-ruta = hf_hub_download("<tu-usuario>/boe-extractor", "Qwen2.5-1.5B-Instruct.Q4_K_M.gguf")
+ruta = hf_hub_download("inigo99/boe-extractor", "Qwen2.5-1.5B-Instruct.Q4_K_M.gguf")
 llm = cargar(ruta)
 
 doc = {
