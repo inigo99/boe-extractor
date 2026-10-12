@@ -95,3 +95,19 @@ el sumario del BOE, clasifica los candidatos, extrae cada uno con el modelo GGUF
 runner (`boe-diario`) y publica `datos/AAAA-MM-DD.jsonl` y una página con las tablas del día en
 GitHub Pages (rama `gh-pages`). El modelo se descarga de Hugging Face (variables del repo
 `MODELO_HF` y `MODELO_GGUF`) y se guarda en la caché de Actions.
+
+## API
+
+```bash
+BOE_MODELO=modelos/modelo.gguf uv run --group api --with llama-cpp-python==0.3.19 \
+  --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
+  uvicorn boe_extractor.api:app
+
+curl -X POST localhost:8000/extract -H 'Content-Type: application/json' \
+  -d '{"tipo": "ayuda", "titulo": "Extracto de la Resolución…", "texto": "BDNS (Identif.): …"}'
+```
+
+`POST /extract` recibe `tipo`, `titulo`, `departamento` (opcional) y el texto plano, y devuelve el
+JSON validado contra el esquema con latencia y tokens; `GET /health` indica si el modelo está
+cargado. Documentación interactiva en `/docs`. Atiende un documento cada vez (llama.cpp no admite
+llamadas concurrentes sobre el mismo modelo).

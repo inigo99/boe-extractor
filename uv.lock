@@ -247,10 +247,17 @@ dependencies = [
 anotar = [
     { name = "streamlit" },
 ]
+api = [
+    { name = "fastapi" },
+    { name = "uvicorn" },
+]
 dev = [
+    { name = "fastapi" },
+    { name = "httpx" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "ruff" },
+    { name = "uvicorn" },
 ]
 exp = [
     { name = "mlflow" },
@@ -266,10 +273,17 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 anotar = [{ name = "streamlit", specifier = ">=1.40" }]
+api = [
+    { name = "fastapi", specifier = ">=0.115" },
+    { name = "uvicorn", specifier = ">=0.30" },
+]
 dev = [
+    { name = "fastapi", specifier = ">=0.115" },
+    { name = "httpx", specifier = ">=0.27" },
     { name = "pre-commit", specifier = ">=3" },
     { name = "pytest", specifier = ">=8" },
     { name = "ruff", specifier = ">=0.6" },
+    { name = "uvicorn", specifier = ">=0.30" },
 ]
 exp = [{ name = "mlflow", specifier = ">=3" }]
 
