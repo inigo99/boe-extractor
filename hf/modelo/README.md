@@ -55,14 +55,16 @@ from boe_extractor.docs import recortar
 from boe_extractor.infer_cpu import cargar, extraer
 from boe_extractor.train.sft import ejemplo
 
-ruta = hf_hub_download("<tu-usuario>/boe-extractor-qwen2.5-1.5b-gguf",
-                       "Qwen2.5-1.5B-Instruct.Q4_K_M.gguf")
+ruta = hf_hub_download("<tu-usuario>/boe-extractor", "Qwen2.5-1.5B-Instruct.Q4_K_M.gguf")
 llm = cargar(ruta)
 
-doc = {"id": "BOE-B-2026-27919", "tipo": "ayuda",
-       "titulo": "Extracto de la Resolución de 17 de agosto de 2026, de la Secretaría de Estado de Educación, …",
-       "departamento": "MINISTERIO DE EDUCACIÓN, FORMACIÓN PROFESIONAL Y DEPORTES"}
-texto = recortar([texto_plano_del_documento])[0]   # máx. 6.144 tokens, como en el entrenamiento
+doc = {
+    "id": "BOE-B-2026-27919",
+    "tipo": "ayuda",
+    "titulo": "Extracto de la Resolución de 17 de agosto de 2026, de la Secretaría de Estado de Educación, …",
+    "departamento": "MINISTERIO DE EDUCACIÓN, FORMACIÓN PROFESIONAL Y DEPORTES",
+}
+texto = recortar([texto_plano_del_documento])[0]  # máx. 6.144 tokens, como en el entrenamiento
 r = extraer(llm, ejemplo(doc, texto)["messages"], doc["tipo"])
 print(r["json"])
 ```
