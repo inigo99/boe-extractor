@@ -23,4 +23,5 @@ def test_pagina():
              {"tipo": "ayuda", "json": None, "url_html": "https://www.boe.es/y"}]  # fmt: skip
     h = pagina("2026-10-13", filas, ["2026-10-13", "2026-10-11"])
     assert "Empleo público (1)" in h and "Ayudas" not in h  # sin JSON válido no se publica
-    assert "&lt;Soria&gt;" in h and "<td>3</td>" in h and 'href="datos/2026-10-11.jsonl"' in h
+    assert "&lt;Soria&gt;" in h and "<td>2 libre, 1 discapacidad</td>" in h
+    assert "<td>Oposición</td>" in h and 'href="datos/2026-10-11.jsonl"' in h

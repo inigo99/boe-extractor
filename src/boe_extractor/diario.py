@@ -57,10 +57,22 @@ def plazo(p: dict | None) -> str:
     return f"hasta el {p['fecha_fin']}" if p.get("fecha_fin") else ""
 
 
+LEGIBLE = {
+    "oposicion": "Oposición", "concurso": "Concurso", "concurso_oposicion": "Concurso-oposición",
+    "libre": "libre", "promocion_interna": "promoción interna", "discapacidad": "discapacidad",
+    "otro": "otro turno",
+}  # fmt: skip
+
+
+def plazas(lista: list[dict]) -> str:
+    """[{'turno': 'libre', 'numero': 2}, …] → '2 libre, 1 discapacidad'."""
+    return ", ".join(f"{p['numero']} {LEGIBLE.get(p['turno'], p['turno'])}" for p in lista)
+
+
 def celdas(tipo: str, j: dict) -> list[str]:
     if tipo == "convocatoria":
-        plazas = sum(x["numero"] for x in j["plazas"]) or ""
-        return [j["organismo"], j["puesto"] or "", str(plazas), j["sistema"] or "",
+        sistema = LEGIBLE.get(j["sistema"] or "", "")
+        return [j["organismo"], j["puesto"] or "", plazas(j["plazas"]), sistema,
                 plazo(j["plazo_solicitudes"])]  # fmt: skip
     if tipo == "ayuda":
         return [j["organismo"], j["objeto"], euros(j["cuantia_total_eur"]),
